@@ -1,9 +1,52 @@
 import { useState } from "react";
+import axios from "axios";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ0c1RsdERmYWZCc1I1YkdpNHJmODM3WVlYRUxLS0NqVFBvdjZmNXRBRVZrIn0.eyJleHAiOjE4MTM1ODAxNDYsImlhdCI6MTc2MTc0MDE0NywiYXV0aF90aW1lIjoxNzYxNzQwMTQ2LCJqdGkiOiJkOGZlOThjZi0zMDUxLTQwYTktOThhZS1iZGEyMDU2NzkyMWEiLCJpc3MiOiJodHRwczovL2F1dGgtZXUtdGVzdC5nby1haWd1YS5jb20vYXV0aC9yZWFsbXMvZGV2X3Byb2R1Y3QiLCJzdWIiOiI1NDQ3NzM2ZC04ZDYzLTQwNzEtYWE2MC05MmQ5MjMxNWNkNzMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJnby1haWd1YS1zb2MiLCJzZXNzaW9uX3N0YXRlIjoiOTRhZjg3ZTQtNWFjYi00ZWFhLWJkMjQtOGI4OWE0NDcwYzBiIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUgZ29haWd1YSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJ1c2VyX25hbWUiOiJhcm1hbi50YWRldm9zeWFuQGlkcmljYS5jb20iLCJuYW1lIjoiQXJtYW4gVGFkZXZvc3lhbiB8IElkcmljYSIsInByZWZlcnJlZF91c2VybmFtZSI6ImFybWFuLnRhZGV2b3N5YW5AaWRyaWNhLmNvbSIsImdpdmVuX25hbWUiOiJBcm1hbiBUYWRldm9zeWFuIHwiLCJmYW1pbHlfbmFtZSI6IklkcmljYSIsImVtYWlsIjoiYXJtYW4udGFkZXZvc3lhbkBpZHJpY2EuY29tIn0.XGh25QfwJXY2vg0CmB98DZccSstWJ3MRikBEV9wcl8zoBz19Hwzj3A1Y2ILnpoHGbr3rFSgAxFfIgjp_DPaRPqGP-97c3GQKsjRgc7BC_-XGYyjNN7jkssxoSySVk5gF9iNpbGtXr2A_Z6xqv6TScmf-VOj7rFZ6HHuZE0C-s3BQR3mE0E-ObghIt74KNChdUC4HcPqu59TVoPCoccTVYDVAysEy8EWNNWwNTzPGMk7JcILE6DWOVbpFttTqcDkcbs6o2Pm6Pd3vGUi0EAee2YNxQ5mv5xuAmtW-Z7n6nb7VGxUj90SUXgb313DjxVrEp2luB3YrhCoID60R0i8lpA";
+
+
+  const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+
+    // 1. Llamamos a tu backend
+    const response = await axios.post(
+  "http://localhost:20001/users/login",
+  { email, password },
+  {
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+    },
+  }
+);
+
+
+    // 2. Imprimir la respuesta en consola (para probar)
+    console.log("LOGIN OK:", response.data);
+
+    // 3. Guardamos el usuario en localStorage (temporal)
+    localStorage.setItem("user", JSON.stringify(response.data));
+
+    // 4. Redirigir a una pantalla nueva
+    window.location.href = "/home";
+
+  } catch (err: any) {
+
+    // Si el servidor respondió con un error (401 o 404)
+    if (err.response) {
+      const message = err.response.data;
+      alert(message);
+    } 
+    // Error de red
+    else {
+      alert("No se pudo conectar con el servidor");
+    }
+  }
+};
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
@@ -23,9 +66,7 @@ export default function Login() {
           {/* FORMULARIO */}
           <form
             className="w-full max-w-sm"
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
+            onSubmit={handleLogin}
             aria-label="Login form"
           >
             {/* TÍTULO DEL LOGIN */}
@@ -113,7 +154,7 @@ export default function Login() {
             {/* BOTONES INICIAR SESION Y REGISTRARSE */}
             <div className="flex-col flex mt-6 gap-3 ">
                 <button type="submit" className="w-full h-12 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors duration-200" >Iniciar sesión</button>
-                <button type="button" className="w-full h-12 rounded-lg border  border-blue-500 text-blue-500 font-semibold hover:bg-blue-100 transition-colors duration-200">Resgistro</button>
+                <button type="button" className="w-full h-12 rounded-lg border  border-blue-500 text-blue-500 font-semibold hover:bg-blue-100 transition-colors duration-200">Registro</button>
             </div>
           </form>
         </div>
