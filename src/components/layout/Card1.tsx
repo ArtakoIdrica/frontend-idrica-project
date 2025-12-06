@@ -1,6 +1,10 @@
+import{useNavigate} from "react-router-dom"
 import React from "react";
 
-export default function Card1({ postTitle, postBody }) {
+export default function Card1({postId, postTitle, postBody }) {
+
+    const navigate= useNavigate();
+
   return (
     <div className="flex flex-col bg-white dark:bg-slate-900 
   border border-slate-200 dark:border-slate-700 
@@ -21,7 +25,7 @@ export default function Card1({ postTitle, postBody }) {
 
       {/* Button */}
       <div className="flex justify-end mt-4">
-        <button className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        <button onClick={() => navigate(`/PostDetail/${postId}`)} className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
           Ver más
         </button>
       </div>
