@@ -1,7 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+
 export default function Header() {
+
+  
+
+
   return (
     <header className="flex items-center justify-between bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-10 py-4">
       
@@ -36,7 +41,7 @@ export default function Header() {
         </Link>
 
         <Link
-          to="/create-post"
+          to="/postform"
           className="text-gray-700 dark:text-gray-300 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400 transition"
         >
           Crear Post
