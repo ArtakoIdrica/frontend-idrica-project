@@ -1,5 +1,6 @@
 import Header from "../components/layout/Header";
 import CommentCard from "../components/layout/CommentCard";
+import  Footer  from "../components/layout/Footer";
 import axios from "axios"
 import {useEffect,useState} from "react"
 import{useParams,useNavigate} from "react-router-dom"
@@ -128,6 +129,7 @@ export default function PostDetail(){
                     </div>
 
                 </div>
+            <Footer/>
         </div>
          
     );

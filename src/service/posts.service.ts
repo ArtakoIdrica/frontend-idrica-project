@@ -35,3 +35,19 @@ export async function getPostsHome(){
 
 
 }
+
+export async function getPaginatedPost(page = 0, pageSize = 8) {
+
+    return axios.get(`${API_URL}/posts/page`,{
+        params:{
+            page,
+            pageSize,
+            orderBy: "id",
+            order: "ASC",
+        },
+        headers:{
+            Authorization: `Bearer ${TOKEN}` 
+        },
+    });
+    
+}

@@ -2,6 +2,7 @@ import Header from "../components/layout/Header"
 import axios from "axios";
 import {useState, useEffect} from "react";
 import { createPost } from "../service/posts.service";
+import  Footer  from "../components/layout/Footer";
 
 export default function PostForm() {
 
@@ -15,6 +16,7 @@ export default function PostForm() {
   async function handleSubmit() {
    
     try {
+        console.log(localStorage.getItem("theme"));
         const post={
 
             userId:user.id,
@@ -28,6 +30,7 @@ export default function PostForm() {
     } catch (error) {
         setError("No se a podido crear un nuevo post");
     }
+      console.log(localStorage.getItem("theme"));
     
   }
 
@@ -41,7 +44,7 @@ export default function PostForm() {
        <main >
 
         <div className="w-full flex justify-center  px-4 mt-4 ">
-            <div className="w-full max-w-3xl space-y-6 mt-30 ">
+            <div className="w-full max-w-3xl space-y-6 mt-25 mb-10 ">
                 <div className="mb-5">
                      <h1 className="text-3xl text-slate-900 font-bold">Creacion de un nuevo post</h1>
                 </div>
@@ -67,6 +70,7 @@ export default function PostForm() {
         </div>
         
        </main>
+       <Footer/>
 
        </>
     );
