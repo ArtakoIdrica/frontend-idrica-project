@@ -3,10 +3,13 @@
 import { createSlice, createAsyncThunk} from "@reduxjs/toolkit";
 import { type PayloadAction } from "@reduxjs/toolkit";
 
+
 import { 
   getPaginatedPost, 
   getPost as apiGetPost, 
-  createPost as apiCreatePost 
+  createPost as apiCreatePost ,
+  deletePost as apiDeletePost,
+  searchByTitle as apiSearchByTitle
 } from "../../service/posts.service";
 
 
@@ -19,7 +22,8 @@ interface PostsState {
   error: string | null;  
   page: number;          
   pageSize: number;      
-  totalPages: number;    
+  totalPages: number;  
+  isSearching: boolean;  
 }
 
 
@@ -32,6 +36,7 @@ const initialState: PostsState = {
   page: 0,
   pageSize: 8,
   totalPages: 0,
+  isSearching: false
 };
 
 
@@ -63,6 +68,25 @@ export const createNewPost = createAsyncThunk(
   }
 );
 
+export const deletePost = createAsyncThunk(
+  "posts/deletePost",
+  async (postId: number) => {
+    await apiDeletePost(postId);
+    return postId; 
+  }
+);
+
+
+export const searchPost = createAsyncThunk(
+   "posts/fetchSearchPost",
+  async (title:string) => {
+   const res =  await apiSearchByTitle(title);
+    return res.data;
+  }
+);
+
+ 
+
 
 
 const postsSlice = createSlice({
@@ -76,12 +100,18 @@ const postsSlice = createSlice({
     setPage(state, action: PayloadAction<number>) {
       state.page = action.payload;
     },
+
+    clearSearch(state) {
+    state.isSearching = false;
+  },
   },
 
   
   extraReducers: (builder) => {
     builder
-      
+    
+      //fetchPaginatedPosts
+
       .addCase(fetchPaginatedPosts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -98,7 +128,8 @@ const postsSlice = createSlice({
         state.error = "No se pudieron cargar los posts";
       })
 
-      
+      //fetchPostById
+
       .addCase(fetchPostById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -114,7 +145,8 @@ const postsSlice = createSlice({
         state.error = "No se pudo cargar el post";
       })
 
-     
+     //createNewPost
+
       .addCase(createNewPost.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -129,13 +161,50 @@ const postsSlice = createSlice({
       .addCase(createNewPost.rejected, (state) => {
         state.loading = false;
         state.error = "No se pudo crear el post";
+      })
+      
+      //deletePost
+
+      .addCase(deletePost.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(deletePost.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = state.items.filter(
+          (post) => post.id !== action.payload
+        );
+      })
+
+      .addCase(deletePost.rejected, (state) => {
+        state.loading = false;
+        state.error = "No se pudo eliminar el post";
+      })
+
+      //fetchSearchPost
+
+      .addCase(searchPost.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+     .addCase(searchPost.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload;
+        state.isSearching = true;
+      })
+
+      .addCase(searchPost.rejected, (state) => {
+        state.loading = false;
+        state.error = "No se pudo encontrar ningun post";
       });
   },
 });
 
 
 
-export const { setPage } = postsSlice.actions;
+export const { setPage,clearSearch } = postsSlice.actions;
 
 export default postsSlice.reducer;
 
