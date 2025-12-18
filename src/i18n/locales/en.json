@@ -1,0 +1,77 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong"
+  },
+  "header": {
+    "title": "My blog",
+    "create": "Create post",
+    "dashboard": "dashboard",
+    "account": "account",
+    "home": "home"
+  },
+   "home": {
+    "publication": "Publications",
+    "search": "search by title...",
+    "previous": "previous",
+    "next": "next",
+    "page": "page"
+  },
+  "card":{
+    "show":"show more",
+    "remove":"remove"
+  },
+ "posts": {
+    "back": "Back",
+    "addComment": "Add comment",
+    "comment": "Comments",
+    "sendComment": "Send comment",
+    "writeComment":"Write comment",
+    "alert":"The comment can't be empty"
+  },
+  "postsForm": {
+    "create": "Create new post",
+    "title": "Title",
+    "titleBox": "Write title",
+    "content": "Content",
+    "contentBox":"Write the post content...",
+    "CreateNew":"Create post",
+    "alert":"Títle and body are necessary to create the post",
+    "creating":"Creating..."
+  },
+  "dashboard": {
+    "loading": "Loading dashboard...",
+    "title": "Global dashboard",
+    "stats": {
+      "totalPosts": "Total posts",
+      "totalComments": "Total comments"
+    }
+  },
+  "account": {
+    "title": "My account",
+    "userInfo": {
+      "title": "Personal information",
+      "username": "Username",
+      "email": "Email"
+    },
+    "activity": {
+      "title": "My activity",
+      "loading": "Loading statistics...",
+      "posts": "My posts",
+      "comments": "My comments"
+    },
+    "actions": {
+      "logout": "Log out"
+    }
+  },
+  "footer": {
+    "title": "My Blog © {{year}}",
+    "subtitle": "Built with React, TailwindCSS and lots of coffee ☕",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "contact": "Contact"
+    }
+  }
+
+}

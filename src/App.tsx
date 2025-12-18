@@ -5,6 +5,7 @@ import PostDetail from "./pages/PostDetail";
 import PostForm from "./pages/PostForm";
 import Account from "./pages/Account";
 import Register from "./pages/Register";
+import Dashboard from "./pages/dashboard"
 
 export default function App(){
 
@@ -16,6 +17,7 @@ export default function App(){
             <Route path="/PostForm" element={<PostForm/>} />
             <Route path="/Account" element={<Account/>} />
             <Route path="/Register" element={<Register/>} />
+            <Route path="/dashboard" element={<Dashboard/>} />
         </Routes>
     );
 }

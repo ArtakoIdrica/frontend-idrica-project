@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 
 interface Card1Props {
   postId: number;
@@ -17,6 +19,7 @@ export default function Card1({
   onDelete,
 }: Card1Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -42,7 +45,7 @@ export default function Card1({
           onClick={() => navigate(`/PostDetail/${postId}`)}
           className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
         >
-          Ver más
+          {t("card.show")}
         </button>
 
         {isOwner && (
@@ -53,7 +56,7 @@ export default function Card1({
               onClick={() => onDelete(postId)}
               className="px-3 py-1 text-sm bg-red-700 text-white rounded hover:bg-red-800 transition"
             >
-              Eliminar
+              {t("card.remove")}
             </button>
 
           </div>
