@@ -1,97 +1,139 @@
-import  Header  from "../components/layout/Header";
-import { useState,useEffect } from "react";
-import Card1 from "../components/layout/Card1"
-import axios from "axios";
-import { getPostsHome,getPaginatedPost  } from "../service/posts.service";
-import  Footer  from "../components/layout/Footer";
+import Header from "../components/layout/Header";
+import Card1 from "../components/layout/Card1";
+import Footer from "../components/layout/Footer";
+
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+
+import {
+  fetchPaginatedPosts,
+  setPage,
+  deletePost,
+  searchPost,
+  clearSearch,
+} from "../store/slices/posts.slice";
+
+export default function Home(): JSX.Element {
 
 
-export default function Home(){
+  const [searchText, setSearchText] = useState("");
 
-    const [posts, setPosts] = useState([]);
-    const[loading, setLoading] = useState(true);
-    const[error,setError] = useState(null);
-    const [page, setPage] = useState<number>(0);
-    const [pageSize] = useState<number>(8);
-    const [totalPages, setTotalPages] = useState<number>(0);
+  const dispatch = useAppDispatch();
+
+  
+  const {
+    items: posts,
+    loading,
+    error,
+    page,
+    pageSize,
+    totalPages,
+    isSearching,
+  } = useAppSelector((state) => state.posts);
+
+  const user = useAppSelector((state) => state.auth.user);
 
 
-     useEffect(()=>{
-        let cancelled = false;
+  function handleDeletePost(postId: number) {
+    if (window.confirm("¿Seguro que quieres eliminar este post?")) {
+      dispatch(deletePost(postId));
+    }
+  }
 
-        async function loadPage() {
-           
+ 
 
 
-         try {
-             //empieza a cargar la pagina
-            setLoading(true);
-            setError(null);
+  
+  useEffect(() => {
+    if (!isSearching) {
+      dispatch(fetchPaginatedPosts({ page, pageSize }));
+    }
+  }, [dispatch, page, pageSize, isSearching]);
 
-            const res = await getPaginatedPost(page , pageSize);
 
-            //si el user cambia de pagina antes de que carge todo ejecutamos el cleanup y asi no peta
-            if(cancelled) return;
+  useEffect(() => {
+    const trimmedSearch = searchText.trim();
 
-            setPosts(res.data.results);
-            setTotalPages(res.data.page.totalPages);
-            
-         } catch (error) {
-            if (cancelled) return;
-            setError("No se pudieron cargar los posts");
-            console.error(error);
+    if (trimmedSearch.length > 0) {
+     
+      dispatch(searchPost(trimmedSearch));
+    } else {
+      
+      if (isSearching) {
+        dispatch(clearSearch());
+        dispatch(fetchPaginatedPosts({ page, pageSize }));
+      }
+    }
+  }, [searchText, dispatch]);
 
-         } finally{
-             //aqui termina ya de cargar la pagina
-             if (!cancelled) setLoading(false);
-            
-         }
-            
+  if (loading) return <p>cargando posts...</p>;
+  if (error) return <p>{error}</p>;
 
-        
-        }
+  return (
+    <>
+      <Header />
 
-        loadPage();
-        
+      <div className="m-10">
+        <h1 className="font-semibold text-lg mb-4">
+          Dashboard de publicaciones
+        </h1>
 
-        //el clean up
-         return () => {
-        cancelled = true;
-            };
+        {/* BUSCADOR */}
+        <div className="flex justify-center mb-6">
+          <input
+            type="text"
+            placeholder="Buscar por título..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="w-full max-w-md px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-     },[page]);
+        {/* POSTS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          {posts.map((post: any) => {
+            const isOwner = user && post.userId === user.id;
 
-    if (loading) return <p>cargando posts...</p>;
-    if (error)  return <p>{error}</p>;  
-
-    return(
-        <>
-        <Header />
-        <div className="m-10">
-            <h1 className="font-semibold text-lg">Dashboard de publicaciones</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                
-                {posts.map((post)=>
-                <Card1
+            return (
+              <Card1
                 key={post.id}
                 postId={post.id}
                 postTitle={post.title}
                 postBody={post.body}
-                />
-                )}
-
-               
-
-            </div>
-
-                <div className="flex justify-center gap-4 mt-6">
-                    <button className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onClick={()=>setPage(page-1)}>Anterior</button>
-                    <span>Página {page + 1} de {totalPages}</span>
-                    <button disabled={page === totalPages - 1 }  className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onClick={()=>setPage(page+1)}>Siguiente</button>
-                </div>
+                isOwner={isOwner}
+                onDelete={handleDeletePost}
+              />
+            );
+          })}
         </div>
-        <Footer />
-        </>
-    );
 
+        {/* PAGINACIÓN (solo visible cuando NO se busca) */}
+        {!isSearching && (
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              onClick={() => dispatch(setPage(Math.max(0, page - 1)))}
+              disabled={page === 0}
+            >
+              Anterior
+            </button>
+
+            <span>
+              Página {page + 1} de {totalPages}
+            </span>
+
+            <button
+              disabled={page === totalPages - 1}
+              className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+              onClick={() => dispatch(setPage(page + 1))}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
+      </div>
+
+      <Footer />
+    </>
+  );
 }

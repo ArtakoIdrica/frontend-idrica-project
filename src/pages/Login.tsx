@@ -1,156 +1,126 @@
-import { useState } from "react";
-import axios from "axios";
-import { login  } from "../service/user.service";
-import  Footer  from "../components/layout/Footer";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+import Footer from "../components/layout/Footer";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { loginUser } from "../store/slices/auth.slice";
+
 export default function Login() {
+ 
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+ 
+  const { user, loading, error } = useAppSelector((state) => state.auth);
 
-
-  const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  try {
-
-    // 1. Llamamos a tu backend
-    const response = await login(email,password);
-
-    // 2. Imprimir la respuesta en consola (para probar)
-    console.log("LOGIN OK:", response.data);
-
-    // 3. Guardamos el usuario en localStorage (temporal)
-    localStorage.setItem("user", JSON.stringify(response.data));
-
-    // 4. Redirigir a una pantalla nueva
-    window.location.href = "/home";
-
-  } catch (err: any) {
-
-    // Si el servidor respondió con un error (401 o 404)
-    if (err.response) {
-      const message = err.response.data;
-      alert(message);
-    } 
-    // Error de red
-    else {
-      alert("No se pudo conectar con el servidor");
-    }
+  
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    dispatch(loginUser({ email, password }));
   }
-};
+
+ 
+  useEffect(() => {
+    if (user) {
+      navigate("/home");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-4xl min-h-[600px] bg-white rounded-lg shadow-lg flex">
         
-        {/* Columna izquierda (imagen) */}
+        {/* Columna izquierda */}
         <div
-          className="flex-1 rounded-l-lg bg-cover bg-no-repeat bg-center"
+          className="flex-1 rounded-l-lg bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1503264116251-35a269479413')`,
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1503264116251-35a269479413')",
           }}
         />
 
-        {/* Columna derecha (formulario) */}
+        {/* Columna derecha */}
         <div className="flex-1 p-8 flex flex-col justify-start">
-
-          {/* FORMULARIO */}
           <form
             className="w-full max-w-sm"
             onSubmit={handleLogin}
             aria-label="Login form"
           >
-            {/* TÍTULO DEL LOGIN */}
             <div className="text-center mb-8 mt-4">
-              <h1 className="text-3xl font-bold text-gray-900">Bienvenido de nuevo</h1>
-              <h2 className="text-sm text-gray-500 mt-2">Inicia sesión para continuar</h2>
+              <h1 className="text-3xl font-bold">Bienvenido de nuevo</h1>
+              <h2 className="text-sm text-gray-500 mt-2">
+                Inicia sesión para continuar
+              </h2>
             </div>
 
-            {/* INPUT EMAIL */}
-            <label htmlFor="email" className="block mb-4">
-              <span className="text-gray-900 font-medium text-base block mb-2">
+            {error && (
+              <p className="text-red-500 text-sm mb-4">{error}</p>
+            )}
+
+            {/* EMAIL */}
+            <label className="block mb-4">
+              <span className="font-medium block mb-2">
                 Correo Electrónico
               </span>
-
-              <div className="flex items-center rounded-lg bg-white border border-gray-200 focus-within:ring-2 focus-within:ring-blue-200">
-                <span className="flex items-center justify-center pl-4 pr-2 text-gray-500 text-lg">
-                  👤
-                </span>
-
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu email"
-                  className="flex-1 h-14 px-4 placeholder:text-gray-400 text-gray-900 bg-transparent focus:outline-none"
-                  required
-                />
-              </div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full h-12 px-4 border rounded-lg"
+                required
+              />
             </label>
 
-            {/* INPUT PASSWORD */}
-            <label htmlFor="password" className="block mb-4">
-              <span className="text-gray-900 font-medium text-base block mb-2">
+            {/* PASSWORD */}
+            <label className="block mb-4">
+              <span className="font-medium block mb-2">
                 Contraseña
               </span>
 
-              <div className="flex items-center rounded-lg bg-white border border-gray-200 focus-within:ring-2 focus-within:ring-blue-200">
-                <span className="flex items-center justify-center pl-4 pr-2 text-gray-500 text-lg">
-                  🔒
-                </span>
-
+              <div className="flex items-center border rounded-lg">
                 <input
-                  id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Introduce tu contraseña"
-                  className="flex-1 h-14 px-4 placeholder:text-gray-400 text-gray-900 bg-transparent focus:outline-none"
+                  className="flex-1 h-12 px-4"
                   required
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="flex items-center justify-center pr-4 pl-2 text-gray-500 text-lg focus:outline-none"
-                  aria-label="Mostrar u ocultar contraseña"
+                  className="px-4"
                 >
                   {showPassword ? "🙈" : "👁️"}
                 </button>
               </div>
             </label>
 
-            {/* RECORDAR SESIÓN + OLVIDÉ CONTRASEÑA */}
-            <div className="flex justify-between items-center pt-2 mb-6">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor="remember" className="text-sm text-gray-600">
-                  Recordar sesión
-                </label>
-              </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-800 transition"
+          >
+            {loading ? "Entrando..." : "Iniciar sesión"}
+          </button>
 
-              <a
-                href="#"
-                className="text-sm font-medium text-blue-600 hover:underline"
-              >
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
-            
-            {/* BOTONES INICIAR SESION Y REGISTRARSE */}
-            <div className="flex-col flex mt-6 gap-3 ">
-                <button type="submit" className="w-full h-12 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors duration-200" >Iniciar sesión</button>
-                <button type="button" className="w-full h-12 rounded-lg border  border-blue-500 text-blue-500 font-semibold hover:bg-blue-100 transition-colors duration-200">Registro</button>
-            </div>
+          <button
+              type="button"
+              onClick={() => navigate("/register")}
+              className="w-full h-12 mt-3 rounded-lg border border-blue-500 text-blue-500 font-semibold hover:bg-blue-100 transition-colors duration-200"
+            >
+              Registro
+          </button>
+
           </form>
         </div>
       </div>
+
+      
     </div>
   );
 }

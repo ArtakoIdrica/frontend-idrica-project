@@ -13,3 +13,15 @@ export async function login(email,password) {
     });
     
 }
+
+export async function registerUser(user: {
+  username: string;
+  email: string;
+  password: string;
+}) {
+  return axios.post(`${API_URL}/users`, user, {
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+    },
+  });
+}
