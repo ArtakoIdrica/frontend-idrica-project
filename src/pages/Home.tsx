@@ -46,6 +46,7 @@ export default function Home(){
                 {posts.map((post)=>
                 <Card1
                 key={post.id}
+                postId={post.id}
                 postTitle={post.title}
                 postBody={post.body}
                 />
