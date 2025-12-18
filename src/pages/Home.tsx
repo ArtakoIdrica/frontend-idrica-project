@@ -2,36 +2,64 @@ import  Header  from "../components/layout/Header";
 import { useState,useEffect } from "react";
 import Card1 from "../components/layout/Card1"
 import axios from "axios";
+import { getPostsHome,getPaginatedPost  } from "../service/posts.service";
+import  Footer  from "../components/layout/Footer";
+
 
 export default function Home(){
 
     const [posts, setPosts] = useState([]);
     const[loading, setLoading] = useState(true);
     const[error,setError] = useState(null);
-    const TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ0c1RsdERmYWZCc1I1YkdpNHJmODM3WVlYRUxLS0NqVFBvdjZmNXRBRVZrIn0.eyJleHAiOjE4MTM1ODAxNDYsImlhdCI6MTc2MTc0MDE0NywiYXV0aF90aW1lIjoxNzYxNzQwMTQ2LCJqdGkiOiJkOGZlOThjZi0zMDUxLTQwYTktOThhZS1iZGEyMDU2NzkyMWEiLCJpc3MiOiJodHRwczovL2F1dGgtZXUtdGVzdC5nby1haWd1YS5jb20vYXV0aC9yZWFsbXMvZGV2X3Byb2R1Y3QiLCJzdWIiOiI1NDQ3NzM2ZC04ZDYzLTQwNzEtYWE2MC05MmQ5MjMxNWNkNzMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJnby1haWd1YS1zb2MiLCJzZXNzaW9uX3N0YXRlIjoiOTRhZjg3ZTQtNWFjYi00ZWFhLWJkMjQtOGI4OWE0NDcwYzBiIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUgZ29haWd1YSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJ1c2VyX25hbWUiOiJhcm1hbi50YWRldm9zeWFuQGlkcmljYS5jb20iLCJuYW1lIjoiQXJtYW4gVGFkZXZvc3lhbiB8IElkcmljYSIsInByZWZlcnJlZF91c2VybmFtZSI6ImFybWFuLnRhZGV2b3N5YW5AaWRyaWNhLmNvbSIsImdpdmVuX25hbWUiOiJBcm1hbiBUYWRldm9zeWFuIHwiLCJmYW1pbHlfbmFtZSI6IklkcmljYSIsImVtYWlsIjoiYXJtYW4udGFkZXZvc3lhbkBpZHJpY2EuY29tIn0.XGh25QfwJXY2vg0CmB98DZccSstWJ3MRikBEV9wcl8zoBz19Hwzj3A1Y2ILnpoHGbr3rFSgAxFfIgjp_DPaRPqGP-97c3GQKsjRgc7BC_-XGYyjNN7jkssxoSySVk5gF9iNpbGtXr2A_Z6xqv6TScmf-VOj7rFZ6HHuZE0C-s3BQR3mE0E-ObghIt74KNChdUC4HcPqu59TVoPCoccTVYDVAysEy8EWNNWwNTzPGMk7JcILE6DWOVbpFttTqcDkcbs6o2Pm6Pd3vGUi0EAee2YNxQ5mv5xuAmtW-Z7n6nb7VGxUj90SUXgb313DjxVrEp2luB3YrhCoID60R0i8lpA";
+    const [page, setPage] = useState<number>(0);
+    const [pageSize] = useState<number>(8);
+    const [totalPages, setTotalPages] = useState<number>(0);
 
-    useEffect(()=>{
 
-        async function getPosts() {
+     useEffect(()=>{
+        let cancelled = false;
+
+        async function loadPage() {
+           
+
+
+         try {
+             //empieza a cargar la pagina
+            setLoading(true);
+            setError(null);
+
+            const res = await getPaginatedPost(page , pageSize);
+
+            //si el user cambia de pagina antes de que carge todo ejecutamos el cleanup y asi no peta
+            if(cancelled) return;
+
+            setPosts(res.data.results);
+            setTotalPages(res.data.page.totalPages);
+            
+         } catch (error) {
+            if (cancelled) return;
+            setError("No se pudieron cargar los posts");
+            console.error(error);
+
+         } finally{
+             //aqui termina ya de cargar la pagina
+             if (!cancelled) setLoading(false);
+            
+         }
             
 
-            try {
-                const response = await axios.get("http://localhost:20001/posts",{
-                headers: {
-                Authorization: `Bearer ${TOKEN}`,
-                },
-                });
-
-            setPosts(response.data.slice(0,8));
-            setLoading(false);
-            } catch (error) {
-                setError("no se a podido cargar los posts ");
-                setLoading(false);
-            }
-
+        
         }
-        getPosts();
-    },[]);
+
+        loadPage();
+        
+
+        //el clean up
+         return () => {
+        cancelled = true;
+            };
+
+     },[page]);
 
     if (loading) return <p>cargando posts...</p>;
     if (error)  return <p>{error}</p>;  
@@ -51,9 +79,18 @@ export default function Home(){
                 postBody={post.body}
                 />
                 )}
+
+               
+
             </div>
+
+                <div className="flex justify-center gap-4 mt-6">
+                    <button className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onClick={()=>setPage(page-1)}>Anterior</button>
+                    <span>Página {page + 1} de {totalPages}</span>
+                    <button disabled={page === totalPages - 1 }  className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onClick={()=>setPage(page+1)}>Siguiente</button>
+                </div>
         </div>
-       
+        <Footer />
         </>
     );
 
