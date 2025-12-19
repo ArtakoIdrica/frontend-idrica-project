@@ -3,6 +3,9 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import PostDetail from "./pages/PostDetail";
 import PostForm from "./pages/PostForm";
+import Account from "./pages/Account";
+import Register from "./pages/Register";
+import Dashboard from "./pages/dashboard"
 
 export default function App(){
 
@@ -12,6 +15,9 @@ export default function App(){
             <Route path="/home" element={<Home />} />
             <Route path="/PostDetail/:postId" element={<PostDetail />} />
             <Route path="/PostForm" element={<PostForm/>} />
+            <Route path="/Account" element={<Account/>} />
+            <Route path="/Register" element={<Register/>} />
+            <Route path="/dashboard" element={<Dashboard/>} />
         </Routes>
     );
 }

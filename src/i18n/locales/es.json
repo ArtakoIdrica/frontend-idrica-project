@@ -1,0 +1,77 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo ha salido mal"
+  },
+  "header": {
+    "title": "Mi blog",
+    "create": "Crear post",
+    "dashboard": "dashboard",
+    "account": "cuenta",
+    "home": "home"
+  },
+    "home": {
+    "publication": "Publicaciones",
+    "search": "Buscar por titulo...",
+    "previous": "anterior",
+    "next": "siguiente",
+    "page": "pagina"
+  },
+  "card":{
+    "show":"ver más",
+    "remove":"remove"
+  },
+  "posts": {
+    "back": "Volver atrás",
+    "addComment": "Añadir comentario",
+    "comment": "comentarios",
+    "sendComment": "Enviar comentario",
+    "writeComment":"Escribir comentario...",
+    "alert":"El comentario no puede estar vacío"
+  },
+  "postsForm": {
+    "create": "Crear nuevo post",
+    "title": "Titulo",
+    "titleBox": "Introduce titulo",
+    "content": "Contenido",
+    "contentBox":"Escribir el contenido del post...",
+    "CreateNew":"Crear post",
+    "alert":"Título y body son obligatorios",
+    "creating":"creando..."
+  },
+  "dashboard": {
+    "loading": "Cargando dashboard...",
+    "title": "Dashboard global",
+    "stats": {
+      "totalPosts": "Total de publicaciones",
+      "totalComments": "Total de comentarios"
+    }
+  },
+  
+  "account": {
+    "title": "Mi cuenta",
+    "userInfo": {
+      "title": "Información personal",
+      "username": "Usuario",
+      "email": "Email"
+    },
+    "activity": {
+      "title": "Mi actividad",
+      "loading": "Cargando estadísticas...",
+      "posts": "Mis posts",
+      "comments": "Mis comentarios"
+    },
+    "actions": {
+      "logout": "Cerrar sesión"
+    }
+  },
+  "footer": {
+    "title": "Mi Blog © {{year}}",
+    "subtitle": "Creado con React, TailwindCSS y mucho café ☕",
+    "links": {
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "contact": "Contacto"
+    }
+  }
+}

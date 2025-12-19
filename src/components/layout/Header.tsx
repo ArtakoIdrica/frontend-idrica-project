@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+
 
 export default function Header() {
   
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("data-theme") === "dark";
   });
+
+  const { t } = useTranslation();
+
 
   
   useEffect(() => {
@@ -42,7 +48,7 @@ export default function Header() {
         </div>
 
         <h2 className="text-lg font-bold tracking-tight">
-          Mi Blog
+          {t("header.title")}
         </h2>
       </div>
 
@@ -55,22 +61,31 @@ export default function Header() {
             to="/home"
             className="text-gray-700 dark:text-gray-300 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400 transition"
           >
-            Home
+           {t("header.home")}
           </Link>
 
           <Link
             to="/postform"
             className="text-gray-700 dark:text-gray-300 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400 transition"
           >
-            Crear Post
+            {t("header.create")}
+          </Link>
+
+           <Link
+            to="/dashboard"
+            className="text-gray-700 dark:text-gray-300 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400 transition"
+          >
+            {t("header.dashboard")}
           </Link>
 
           <Link
             to="/account"
             className="text-gray-700 dark:text-gray-300 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400 transition"
           >
-            Cuenta
+            {t("header.account")}
           </Link>
+
+          
         </nav>
 
         {/* BOTÓN DE MODO OSCURO */}
@@ -85,6 +100,8 @@ export default function Header() {
             <MoonIcon className="w-6 h-6 text-gray-700 dark:text-gray-300" />
           )}
         </button>
+
+        <LanguageSwitcher/>
 
       </div>
 

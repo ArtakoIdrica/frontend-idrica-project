@@ -51,3 +51,22 @@ export async function getPaginatedPost(page = 0, pageSize = 8) {
     });
     
 }
+
+export async function deletePost(postId: number) {
+  return axios.delete(`${API_URL}/posts/${postId}`, {
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+    },
+  });
+}
+
+export async function searchByTitle(postTitle: string) {
+    return axios.get(`${API_URL}/posts/search/${postTitle}`,{
+        headers: {
+         Authorization: `Bearer ${TOKEN}`,
+    },
+    });
+ 
+}
+
+

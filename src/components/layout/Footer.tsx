@@ -1,10 +1,12 @@
-
+import { useTranslation } from "react-i18next";
 
 export default function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer
       className="
-        w-full mt-10 
+        w-full 
         border-t border-slate-200 dark:border-slate-700
         bg-white dark:bg-gray-900
         text-slate-600 dark:text-slate-400
@@ -15,33 +17,33 @@ export default function Footer() {
 
         {/* Nombre del blog */}
         <p className="text-sm font-medium">
-          Mi Blog © {new Date().getFullYear()}
+          {t("footer.title", { year: new Date().getFullYear() })}
         </p>
 
         {/* Subtexto */}
         <p className="text-xs">
-          Creado con React, TailwindCSS y mucho café ☕
+          {t("footer.subtitle")}
         </p>
 
-        {/* Enlaces opcionales */}
+        {/* Enlaces */}
         <div className="flex justify-center gap-6 text-sm">
           <a
             href="#"
             className="hover:text-blue-600 dark:hover:text-blue-400 transition"
           >
-            Privacidad
+            {t("footer.links.privacy")}
           </a>
           <a
             href="#"
             className="hover:text-blue-600 dark:hover:text-blue-400 transition"
           >
-            Términos
+            {t("footer.links.terms")}
           </a>
           <a
             href="#"
             className="hover:text-blue-600 dark:hover:text-blue-400 transition"
           >
-            Contacto
+            {t("footer.links.contact")}
           </a>
         </div>
       </div>

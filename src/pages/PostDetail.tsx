@@ -1,136 +1,173 @@
 import Header from "../components/layout/Header";
 import CommentCard from "../components/layout/CommentCard";
-import  Footer  from "../components/layout/Footer";
-import axios from "axios"
-import {useEffect,useState} from "react"
-import{useParams,useNavigate} from "react-router-dom"
-import { createComment,getComment } from "../service/comments.service";
-import { getPost } from "../service/posts.service";
+import Footer from "../components/layout/Footer";
+import { useTranslation } from "react-i18next";
 
 
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchPostById } from "../store/slices/posts.slice";
+import {
+  fetchGetComment,
+  fetchCreateComment,
+} from "../store/slices/comments.slice";
 
-export default function PostDetail(){
-    const [loading, setLoading] = useState(true);
-    const [error,setError] = useState();
-    const[post,setPost] = useState();
-    const[comments,setComments] = useState([]);
-    const[commentBody,setCommentBody]=useState("");
-    const {postId} = useParams();
-    const navigate=useNavigate();
-    const user =JSON.parse(localStorage.getItem("user"));
+export default function PostDetail() {
+  const dispatch = useAppDispatch();
+  const { postId } = useParams();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
-     
+  const [commentBody, setCommentBody] = useState("");
 
-        async function getCommentsByPost() {
+  const {
+    selectedPost: post,
+    loading: postLoading,
+    error: postError,
+  } = useAppSelector((state) => state.posts);
 
-            try {
-                
-                const resultado = await getComment(postId);
-                setComments(resultado.data);
-                console.log("COMENTARIOS DEL BACKEND:", resultado.data);
+  const {
+    items: comments,
+    loading: commentsLoading,
+    error: commentsError,
+  } = useAppSelector((state) => state.comments);
 
+  const user = useAppSelector((state) => state.auth.user);
 
-            } catch (error) {
-                  setError("No se a podido cargar los comentarios...");
-            }
-            
-        }
+  useEffect(() => {
+    if (!postId) return;
 
-        async function submitComment() {
-            if (!commentBody.trim()) {
-                alert("El comentario no puede estar vacío");
-                return;
-            }
+    dispatch(fetchPostById(postId));
+    dispatch(fetchGetComment(postId));
+  }, [dispatch, postId]);
 
-            const comment = {
-                postId:postId,
-                userId: user.id,
-                name: user.username,
-                email: user.email,
-                body: commentBody,
-            };
+  function submitComment() {
+    if (!commentBody.trim()) {
+      alert(t("posts.alert"));
+      return;
+    }
 
-            try {
-               const response = await createComment(comment);
-                
-                setCommentBody("");
+    const comment = {
+      postId: Number(postId),
+      userId: user.id,
+      name: user.username,
+      email: user.email,
+      body: commentBody,
+    };
 
-                
-                getCommentsByPost();
+    dispatch(fetchCreateComment(comment));
+    setCommentBody("");
+  }
 
-            } catch (error) {
-                console.error("Error enviando comentario:", error);
-            }
-        }
+  return (
+    <>
+      <Header />
 
-    useEffect(() =>{
+      <main className="p-10 bg-slate-100 dark:bg-slate-900 min-h-screen transition-colors">
+        <div className="max-w-3xl mx-auto">
+          {/* BOTÓN VOLVER */}
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="
+              mb-6 inline-flex items-center gap-2
+              px-4 py-1.5 text-sm font-medium
+              bg-blue-600 text-white rounded-lg
+              hover:bg-blue-700 transition
+            "
+          >
+           {t("posts.back")}
+          </button>
 
-        async function getPostById() {
+          {/* ESTADOS */}
+          {postLoading && (
+            <p className="text-center text-slate-500 dark:text-slate-400">
+              {t("common.loading")}
+            </p>
+          )}
 
-            try {
-                const resultado = await getPost(postId);
-                setPost(resultado.data);
-                setLoading(false);
-            } catch (error) {
-                
-                setError("No se a podido cargar la pagina del post");
-                setLoading(false);
+          {postError && (
+            <p className="text-center text-red-500">{postError}</p>
+          )}
 
-            }
+          {/* POST */}
+          {!postLoading && post && (
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow p-6 mb-10 transition-colors">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+                {post.title}
+              </h1>
 
-        }
+              <p className="mt-4 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                {post.body}
+              </p>
+            </div>
+          )}
 
-    
-       
+          {/* NUEVO COMENTARIO */}
+          <div className="mb-10">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
+              {t("posts.addComment")}
+            </h2>
 
-        getPostById();
-        getCommentsByPost();
+            <textarea
+              value={commentBody}
+              onChange={(e) => setCommentBody(e.target.value)}
+              placeholder={t("posts.writeComment")}
+              className="
+                w-full p-3 rounded-lg
+                bg-white dark:bg-slate-800
+                border border-slate-300 dark:border-slate-700
+                text-slate-900 dark:text-slate-100
+                placeholder-slate-400
+                focus:outline-none focus:ring-2 focus:ring-blue-500
+                transition
+              "
+            />
 
-    },[]);
+            <button
+              onClick={submitComment}
+              className="
+                mt-3 px-4 py-1.5 text-sm font-medium
+                bg-blue-600 text-white rounded-lg
+                hover:bg-blue-700 transition
+              "
+            >
+              {t("posts.sendComment")}
+            </button>
+          </div>
 
-    if (loading)return <p>Cargando el post</p> ;
-    if (error) return <p>{error}</p>;
+          {/* COMENTARIOS */}
+          <div>
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">
+              {t("posts.comment")}
+            </h3>
 
-    return(
-        <div>
-            <Header/>
-                <div className="w-full flex justify-center px-4 py-1 mt-3 ">
-                   
-                    <div className="w-full max-w-3xl">
-                         <button type="button" className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition mb-4" onClick={()=> navigate(-1)}>Volver atrás</button>
-                        <div className="bg-white dark:bg-slate-900 border border-slate-600 dark:border-slate-100 shadow-lg rounded-xl p-6">
-                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{post.title}</h1>
-                            <p className="mt-4 text-lg leading-relaxed text-slate-700 dark:text-slate-300">{post.body}</p>
-                        </div>
+            {commentsLoading && (
+              <p className="text-slate-500 dark:text-slate-400">
+                Cargando comentarios...
+              </p>
+            )}
 
-                        <div className =" mt-4">
-                            <h2 className="text-xl font-semibold text-slate-900  mb-3">Añadir comentario</h2>
-                            <textarea className ="w-full p-3 border border-slate-300 dark:border-slate-700 
-                            rounded-lg bg-white dark:bg-slate-900
-                            text-slate-800 dark:text-slate-400
-                            focus:outline-none focus:ring-2 focus:ring-blue-500
-                            transition"  value={commentBody} onChange={(e)=> setCommentBody(e.target.value)} placeholder="Escribir comentario" ></textarea>
-                            <button onClick={submitComment} className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" type="button">Enviar</button>
-                        </div>
-                        <div className="mt-3">
-                            <h3 className="text-xl font-semibold text-slate-900  mb-3">Comentarios</h3>
-                        </div>
+            {commentsError && (
+              <p className="text-red-500">{commentsError}</p>
+            )}
 
-                        {comments.map((comment)=>{
-                            
-                            return (<CommentCard
-                            key={comment.id}
-                            commentUsername ={comment.name}
-                            commentBody ={comment.body}
-                            />);
-
-                        })}
-                    </div>
-
-                </div>
-            <Footer/>
+            <div className="space-y-4">
+              {comments.map((comment) => (
+                <CommentCard
+                  key={comment.id}
+                  commentUsername={comment.name}
+                  commentBody={comment.body}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-         
-    );
+      </main>
+
+      <Footer />
+    </>
+  );
 }
